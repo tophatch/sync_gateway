@@ -1196,13 +1196,6 @@ func (bucket CouchbaseBucketGoCB) WriteUpdateWithXattr(k string, xattrKey string
 			return err
 		}
 
-		// TODO: Avoid unmarshalling the raw xattr value here
-		var xattrMap map[string]interface{}
-		err = json.Unmarshal(updatedXattrValue, &xattrMap)
-		if err != nil {
-			return err
-		}
-
 		var writeErr error
 		// If this is a tombstone, we want to delete the document and update the xattr
 		if deleteDoc {

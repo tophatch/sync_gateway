@@ -47,11 +47,12 @@ var RunStateString = []string{
 }
 
 const (
-	DefaultRevsLimit = 1000
-	DefaultUseXattrs = false            // Whether Sync Gateway uses xattrs for metadata storage, if not specified in the config
-	KSyncKeyPrefix   = "_sync:"         // All special/internal documents the gateway creates have this prefix in their keys.
-	kSyncDataKey     = "_sync:syncdata" // Key used to store sync function
-	KSyncXattrName   = "_sync"          // Name of XATTR used to store sync metadata
+	DefaultRevsLimit     = 1000
+	DefaultUseXattrs     = false               // Whether Sync Gateway uses xattrs for metadata storage, if not specified in the config
+	DefaultPurgeInterval = 30 * 24 * time.Hour // Default metadata purge interval.  Used if server's purge interval is unavailable
+	KSyncKeyPrefix       = "_sync:"            // All special/internal documents the gateway creates have this prefix in their keys.
+	kSyncDataKey         = "_sync:syncdata"    // Key used to store sync function
+	KSyncXattrName       = "_sync"             // Name of XATTR used to store sync metadata
 )
 
 // Basic description of a database. Shared between all Database objects on the same database.
@@ -80,6 +81,7 @@ type DatabaseContext struct {
 	State              uint32                  // The runtime state of the DB from a service perspective
 	ExitChanges        chan struct{}           // Active _changes feeds on the DB will close when this channel is closed
 	OIDCProviders      auth.OIDCProviderMap    // OIDC clients
+	PurgeInterval      time.Duration           // Metadata purge interval
 }
 
 type DatabaseContextOptions struct {
@@ -318,6 +320,8 @@ func NewDatabaseContext(dbName string, bucket base.Bucket, autoImport bool, opti
 		go context.watchDocChanges()
 	}
 
+	context.PurgeInterval = DefaultPurgeInterval
+
 	return context, nil
 }
 
@@ -542,6 +546,13 @@ func installViews(bucket base.Bucket, useXattrs bool) error {
                      		emit(doc.username, meta.id);}`
 	sessions_map = fmt.Sprintf(sessions_map, len(auth.SessionKeyPrefix), auth.SessionKeyPrefix)
 
+	// Tombstones view - used for view tombstone compaction
+	// Key is purge time; value is docid
+	tombstones_map := `function (doc, meta) {
+                     	var sync = meta.xattrs._sync;
+                     	if (sync !== undefined)
+                     		emit(sync.tombstoned_at, meta.id);}`
+
 	// All-principals view
 	// Key is name; value is true for user, false for role
 	principals_map := `function (doc, meta) {
@@ -682,11 +693,12 @@ func installViews(bucket base.Bucket, useXattrs bool) error {
 
 	designDocMap[DesignDocSyncHousekeeping] = sgbucket.DesignDoc{
 		Views: sgbucket.ViewMap{
-			ViewAllBits:  sgbucket.ViewDef{Map: allbits_map},
-			ViewAllDocs:  sgbucket.ViewDef{Map: alldocs_map, Reduce: "_count"},
-			ViewImport:   sgbucket.ViewDef{Map: import_map, Reduce: "_count"},
-			ViewOldRevs:  sgbucket.ViewDef{Map: oldrevs_map, Reduce: "_count"},
-			ViewSessions: sgbucket.ViewDef{Map: sessions_map},
+			ViewAllBits:    sgbucket.ViewDef{Map: allbits_map},
+			ViewAllDocs:    sgbucket.ViewDef{Map: alldocs_map, Reduce: "_count"},
+			ViewImport:     sgbucket.ViewDef{Map: import_map, Reduce: "_count"},
+			ViewOldRevs:    sgbucket.ViewDef{Map: oldrevs_map, Reduce: "_count"},
+			ViewSessions:   sgbucket.ViewDef{Map: sessions_map},
+			ViewTombstones: sgbucket.ViewDef{Map: tombstones_map},
 		},
 	}
 
@@ -855,24 +867,47 @@ func (db *DatabaseContext) DeleteUserSessions(userName string) error {
 	return nil
 }
 
-// Deletes old revisions that have been moved to individual docs
+// Trigger tombstone compaction from views.  Several Sync Gateway views index server tombstones (deleted documents with an xattr).
+// There currently isn't a mechanism for server to remove these docs from the index when the tombstone is purged by the server during
+// metadata purge, because metadata purge doesn't trigger a DCP event.
+// When compact is run, Sync Gateway initiates a normal delete operation for the document and xattr (a Sync Gateway purge).  This triggers
+// removal of the document from the view index.  In the event that the document has already been purged by server, we need to recreate and delete
+// the document to accomplish the same result.
 func (db *Database) Compact() (int, error) {
-	opts := Body{"stale": false, "reduce": false}
-	vres, err := db.Bucket.View(DesignDocSyncHousekeeping, ViewOldRevs, opts)
+
+	// Trigger view compaction for all tombstoned documents older than the purge interval
+	opts := Body{}
+	opts["stale"] = "ok"
+	opts["startkey"] = 1
+	opts["endkey"] = time.Now().Sub(db.PurgeInterval).Unix()
+	vres, err := db.Bucket.View(DesignDocSyncHousekeeping, ViewTombstones, opts)
 	if err != nil {
-		base.Warn("old_revs view returned %v", err)
+		base.Warn("Tombstones view returned error during compact: %v", err)
 		return 0, err
 	}
 
-	//FIX: Is there a way to do this in one operation?
-	base.Logf("Compacting away %d old revs of %q ...", len(vres.Rows), db.Name)
+	base.Logf("Compacting %d purged tombstones from view for %s ...", len(vres.Rows), db.Name)
+	purgeBody := Body{"purge": true}
 	count := 0
 	for _, row := range vres.Rows {
 		base.LogTo("CRUD", "\tDeleting %q", row.ID)
-		if err := db.Bucket.Delete(row.ID); err != nil {
-			base.Warn("Error deleting %q: %v", row.ID, err)
-		} else {
+		// First attempt to purge.
+		purgeErr := db.Purge(row.ID)
+		// If key no longer exists, need to add and remove to trigger removal from view
+		if purgeErr == nil {
 			count++
+		} else if base.IsKeyNotFoundError(db.Bucket, purgeErr) {
+			_, addErr := db.Bucket.Add(row.ID, 0, purgeBody)
+			if addErr != nil {
+				base.Warn("Error compacting key %s (add) - ignoring.  %v", row.ID, addErr)
+				continue
+			}
+			if delErr := db.Bucket.Delete(row.ID); delErr != nil {
+				base.Warn("Error compacting key %s (delete) - ignoring.  %v", row.ID, delErr)
+			}
+			count++
+		} else {
+			base.Warn("Error compacting key %s (purge) - ignoring.  %v", row.ID, purgeErr)
 		}
 	}
 	return count, nil

@@ -33,7 +33,7 @@
 
   
   <!-- Sync Gateway Accel-->
-  <project groups="notdefault,sg-accel" name="sync-gateway-accel" path="godeps/src/github.com/couchbaselabs/sync-gateway-accel" remote="couchbaselabs_private" revision="2abba15c28fcd92c0d120d9a3277e4049c54ad3b"/>
+  <project groups="notdefault,sg-accel" name="sync-gateway-accel" path="godeps/src/github.com/couchbaselabs/sync-gateway-accel" remote="couchbaselabs_private" revision="3df2e082496ef8753794d909730947fb8003dcdd"/>
 
   <!-- Dependencies specific to Sync Gateway Accel-->
   <project groups="notdefault,sg-accel" name="cbgt" path="godeps/src/github.com/couchbase/cbgt" remote="couchbase" revision="4aaaca921a7ef64900f3b569c33ad87e9e8df065"/>

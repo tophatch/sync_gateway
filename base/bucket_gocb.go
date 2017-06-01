@@ -11,8 +11,10 @@ package base
 
 import (
 	"encoding/json"
+	"errors"
 	"expvar"
 	"fmt"
+	"net/http"
 	"reflect"
 	"strings"
 
@@ -39,6 +41,9 @@ const (
 	// numNodesPersistTo.  In our case, we only want to block until it's durable on the node we're writing to,
 	// so this is set to 1
 	numNodesPersistTo = uint(1)
+
+	// Default metadata purge interval, used when unable to retrieve the server value
+	DefaultMetadataPurgeInterval = 3 // Default metadata purge interval, in days
 )
 
 var recoverableGoCBErrors = map[string]struct{}{
@@ -145,6 +150,67 @@ func (bucket CouchbaseBucketGoCB) GetBucketCredentials() (username, password str
 		_, password, _ = bucket.spec.Auth.GetCredentials()
 	}
 	return bucket.spec.BucketName, password
+}
+
+func (bucket CouchbaseBucketGoCB) GetMetadataPurgeInterval() (int, error) {
+
+	var err error
+
+	// Check for Bucket-specific setting first
+	bucketReqUri := fmt.Sprintf("%s/pools/default/buckets/%s", bucket.spec.Server, bucket.spec.BucketName)
+
+	bucketPurgeInterval, err := bucket.RetrievePurgeInterval(bucketReqUri)
+	if bucketPurgeInterval > 0 || err != nil {
+		return bucketPurgeInterval, err
+	}
+
+	// Cluster-wide settings
+	clusterReqUri := fmt.Sprintf("%s/settings/autoCompaction", bucket.spec.Server)
+	clusterPurgeInterval, err := bucket.RetrievePurgeInterval(clusterReqUri)
+	if clusterPurgeInterval > 0 || err != nil {
+		return clusterPurgeInterval, err
+	}
+
+	return 0, nil
+
+}
+
+func (bucket CouchbaseBucketGoCB) RetrievePurgeInterval(uri string) (int, error) {
+
+	// Both of the purge interval endpoints (cluster and bucket) return purgeInterval in the same way
+	var purgeResponse struct {
+		PurgeInterval int `json:"purgeInterval,omitempty"`
+	}
+
+	req, err := http.NewRequest("GET", uri, nil)
+	if err != nil {
+		return 0, err
+	}
+	username, password, _ := bucket.spec.Auth.GetCredentials()
+	req.SetBasicAuth(username, password)
+
+	client := bucket.Bucket.IoRouter()
+	resp, err := client.HttpClient().Do(req)
+	if err != nil {
+		return 0, err
+	}
+
+	jsonDec := json.NewDecoder(resp.Body)
+	defer resp.Body.Close()
+	err = jsonDec.Decode(&purgeResponse)
+	if err != nil {
+		return 0, err
+	}
+
+	if resp.StatusCode == http.StatusForbidden {
+		Warn("403 Forbidden attempting to access %s.  Bucket user must have Bucket Full Access and Bucket Admin roles to retrieve metadata purge interval.", uri)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return 0, errors.New(resp.Status)
+	}
+
+	return purgeResponse.PurgeInterval, nil
 }
 
 func (bucket CouchbaseBucketGoCB) GetName() string {
@@ -1215,7 +1281,7 @@ func (bucket CouchbaseBucketGoCB) WriteUpdateWithXattr(k string, xattrKey string
 			}
 
 			// update xattr only
-			_, writeErr := bucket.WriteCasWithXattr(k, xattrKey, exp, cas, nil, xattrMap)
+			_, writeErr := bucket.WriteCasWithXattr(k, xattrKey, exp, cas, nil, updatedXattrValue)
 			if writeErr != nil && writeErr != gocb.ErrKeyExists && !isRecoverableGoCBError(writeErr) {
 				LogTo("CRUD", "Update of new value during WriteUpdateWithXattr failed for key %s: %v", k, writeErr)
 				return writeErr
@@ -1228,7 +1294,7 @@ func (bucket CouchbaseBucketGoCB) WriteUpdateWithXattr(k string, xattrKey string
 		} else {
 
 			// Not a delete - update the body and xattr
-			_, writeErr = bucket.WriteCasWithXattr(k, xattrKey, exp, cas, updatedValue, xattrMap)
+			_, writeErr = bucket.WriteCasWithXattr(k, xattrKey, exp, cas, updatedValue, updatedXattrValue)
 
 			// ErrKeyExists is CAS failure, which we want to retry.  Other non-recoverable errors should cancel the
 			// WriteUpdate.

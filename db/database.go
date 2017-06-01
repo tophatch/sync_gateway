@@ -48,11 +48,11 @@ var RunStateString = []string{
 
 const (
 	DefaultRevsLimit     = 1000
-	DefaultUseXattrs     = false               // Whether Sync Gateway uses xattrs for metadata storage, if not specified in the config
-	DefaultPurgeInterval = 30 * 24 * time.Hour // Default metadata purge interval.  Used if server's purge interval is unavailable
-	KSyncKeyPrefix       = "_sync:"            // All special/internal documents the gateway creates have this prefix in their keys.
-	kSyncDataKey         = "_sync:syncdata"    // Key used to store sync function
-	KSyncXattrName       = "_sync"             // Name of XATTR used to store sync metadata
+	DefaultUseXattrs     = false            // Whether Sync Gateway uses xattrs for metadata storage, if not specified in the config
+	DefaultPurgeInterval = 30               // Default metadata purge interval, in days.  Used if server's purge interval is unavailable
+	KSyncKeyPrefix       = "_sync:"         // All special/internal documents the gateway creates have this prefix in their keys.
+	kSyncDataKey         = "_sync:syncdata" // Key used to store sync function
+	KSyncXattrName       = "_sync"          // Name of XATTR used to store sync metadata
 )
 
 // Basic description of a database. Shared between all Database objects on the same database.
@@ -81,7 +81,7 @@ type DatabaseContext struct {
 	State              uint32                  // The runtime state of the DB from a service perspective
 	ExitChanges        chan struct{}           // Active _changes feeds on the DB will close when this channel is closed
 	OIDCProviders      auth.OIDCProviderMap    // OIDC clients
-	PurgeInterval      time.Duration           // Metadata purge interval
+	PurgeInterval      int                     // Metadata purge interval, in days
 }
 
 type DatabaseContextOptions struct {
@@ -318,9 +318,20 @@ func NewDatabaseContext(dbName string, bucket base.Bucket, autoImport bool, opti
 	// watchDocChanges is used for bucket shadowing and legacy import - not required when running w/ xattrs.
 	if !context.UseXattrs() {
 		go context.watchDocChanges()
+	} else {
+		// Set the purge interval for tombstone compaction
+		context.PurgeInterval = DefaultPurgeInterval
+		gocbBucket, ok := bucket.(*base.CouchbaseBucketGoCB)
+		if ok {
+			serverPurgeInterval, err := gocbBucket.GetMetadataPurgeInterval()
+			if err != nil {
+				base.Warn("Unable to retrieve server's metadata purge interval - will use default value. %s", err)
+			} else if serverPurgeInterval > 0 {
+				context.PurgeInterval = serverPurgeInterval
+			}
+		}
+		base.Logf("Using metadata purge interval of %d days for tombstone compaction.", context.PurgeInterval)
 	}
-
-	context.PurgeInterval = DefaultPurgeInterval
 
 	return context, nil
 }
@@ -879,7 +890,7 @@ func (db *Database) Compact() (int, error) {
 	opts := Body{}
 	opts["stale"] = "ok"
 	opts["startkey"] = 1
-	opts["endkey"] = time.Now().Sub(db.PurgeInterval).Unix()
+	opts["endkey"] = time.Now().AddDate(-1*db.PurgeInterval, 0, 0).Unix()
 	vres, err := db.Bucket.View(DesignDocSyncHousekeeping, ViewTombstones, opts)
 	if err != nil {
 		base.Warn("Tombstones view returned error during compact: %v", err)

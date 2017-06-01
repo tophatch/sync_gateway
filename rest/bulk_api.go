@@ -18,9 +18,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/db"
 	"time"
 )
 
@@ -318,7 +318,7 @@ func (h *handler) handleBulkGet() error {
 
 	// Exception: if the user agent is empty or earlier than 1.2, and X-Accept-Part-Encoding=gzip, then we actually
 	// DO want to compress the parts since the full response will not be gzipped, since those clients can't handle it.
-	// See https://github.com/couchbase/sync_gateway/issues/1419 and encoded_response_writer.go
+	// See https://github.com/tophatch/sync_gateway/issues/1419 and encoded_response_writer.go
 	userAgentVersion := NewUserAgentVersion(h.rq.Header.Get("User-Agent"))
 	if userAgentVersion.IsBefore(1, 2) && acceptGzipPartEncoding {
 		canCompressParts = true

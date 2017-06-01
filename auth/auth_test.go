@@ -18,8 +18,8 @@ import (
 
 	"github.com/couchbaselabs/go.assert"
 
-	"github.com/couchbase/sync_gateway/base"
-	ch "github.com/couchbase/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/base"
+	ch "github.com/tophatch/sync_gateway/channels"
 )
 
 var gTestBucket base.Bucket

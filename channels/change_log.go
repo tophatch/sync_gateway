@@ -5,7 +5,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/couchbase/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/base"
 )
 
 // LogEntryType

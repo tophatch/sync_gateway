@@ -19,8 +19,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
 )
 
 // Maps what users have access to what channels or roles, and when they got that access.

@@ -14,8 +14,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/rest"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/rest"
 	"time"
 	"math/rand"
 )

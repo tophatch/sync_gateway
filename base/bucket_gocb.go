@@ -117,7 +117,7 @@ func GetCouchbaseBucketGoCB(spec BucketSpec) (bucket *CouchbaseBucketGoCB, err e
 		// Set transcoder to SGTranscoder to avoid cases where it tries to write docs as []byte without setting
 		// the proper doctype flag and then later read them as JSON, which fails because it gets back a []byte
 		// initially this was using SGTranscoder for all GoCB buckets, but due to
-		// https://github.com/couchbase/sync_gateway/pull/2416#issuecomment-288882896
+		// https://github.com/tophatch/sync_gateway/pull/2416#issuecomment-288882896
 		// it's only being set for data buckets
 		goCBBucket.SetTranscoder(SGTranscoder{})
 	}
@@ -1525,7 +1525,7 @@ func (bucket CouchbaseBucketGoCB) Refresh() error {
 
 	// If it's possible to call GetCouchbaseBucketGoCB without error, consider it "refreshed" and return a nil error which will cause the reconnect
 	// loop to stop.  otherwise, return an error which will cause it to keep retrying
-	// This fixes: https://github.com/couchbase/sync_gateway/issues/2423#issuecomment-294651245
+	// This fixes: https://github.com/tophatch/sync_gateway/issues/2423#issuecomment-294651245
 	bucketGoCb, err := GetCouchbaseBucketGoCB(bucket.spec)
 	if bucketGoCb != nil {
 		bucketGoCb.Close()
@@ -1602,7 +1602,7 @@ func (bucket CouchbaseBucketGoCB) CouchbaseServerVersion() (major uint64, minor 
 func (bucket CouchbaseBucketGoCB) UUID() (string, error) {
 
 	// Temp workaround -- create a go-couchbase bucket just to get the UUID
-	// See https://github.com/couchbase/sync_gateway/issues/2418#issuecomment-289941131
+	// See https://github.com/tophatch/sync_gateway/issues/2418#issuecomment-289941131
 	goCouchbaseBucket, err := GetCouchbaseBucket(bucket.spec, nil)
 	if err != nil {
 		return "", err

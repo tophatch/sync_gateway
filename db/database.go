@@ -25,9 +25,9 @@ import (
 	"sync/atomic"
 
 	sgbucket "github.com/couchbase/sg-bucket"
-	"github.com/couchbase/sync_gateway/auth"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/auth"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
 )
 
 const (
@@ -209,7 +209,7 @@ func NewDatabaseContext(dbName string, bucket base.Bucket, autoImport bool, opti
 	context.tapListener.Init(bucket.GetName())
 
 	// TODO: Currently we're forcing the DCP feed to restart from zero if the node is importing xattrs, based on this flag.
-	//       Will be removed when https://github.com/couchbase/sync_gateway/issues/2484 is complete.  Requires DCP processing
+	//       Will be removed when https://github.com/tophatch/sync_gateway/issues/2484 is complete.  Requires DCP processing
 	//       to be synchronous per vbucket
 	xattrImportNode := false
 	if context.UseXattrs() && context.autoImport {

@@ -1442,7 +1442,7 @@ func TestApplyViewQueryOptions(t *testing.T) {
 }
 
 // In certain cases, the params will have strings instead of bools
-// https://github.com/couchbase/sync_gateway/issues/2423#issuecomment-296245658
+// https://github.com/tophatch/sync_gateway/issues/2423#issuecomment-296245658
 func TestApplyViewQueryOptionsWithStrings(t *testing.T) {
 
 	// View query params map (go-couchbase/walrus style)

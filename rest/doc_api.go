@@ -146,6 +146,8 @@ func (h *handler) handleGetAttachment() error {
 	body, err := h.db.GetRev(docid, revid, false, nil)
 	log.Printf("Getting doc attachment: %s rev: %s", docid, revid)
 	if err != nil {
+		log.Printf("Getting doc attachment GetRev errored for: %s rev: %s", docid, revid)
+		log.Printf("%v", err)
 		return err
 	}
 	if body == nil {

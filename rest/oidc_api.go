@@ -16,8 +16,8 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/oauth2"
-	"github.com/couchbase/sync_gateway/auth"
-	"github.com/couchbase/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/auth"
+	"github.com/tophatch/sync_gateway/base"
 )
 
 const (

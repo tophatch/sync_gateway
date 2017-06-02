@@ -75,7 +75,7 @@ if __name__=="__main__":
     product = "sync_gateway"
 
     # Path to source manifest
-    source_manifest_path = "godeps/src/github.com/couchbase/sync_gateway/manifest/default.xml"
+    source_manifest_path = "godeps/src/github.com/tophatch/sync_gateway/manifest/default.xml"
 
     product_repo_commit = discover_product_repo_commit(source_manifest_path)
     

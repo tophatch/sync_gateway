@@ -2,7 +2,7 @@
 Building From Source (via repo)
 -------------------------------
 
-In order to build with [pinned dependencies](https://github.com/couchbase/sync_gateway/blob/master/manifest/default.xml), you will need to use the the `repo` multi-repository tool.
+In order to build with [pinned dependencies](https://github.com/tophatch/sync_gateway/blob/master/manifest/default.xml), you will need to use the the `repo` multi-repository tool.
 
 **Install prequisites**
 
@@ -38,11 +38,11 @@ To build Sync Gateway from source and run the unit tests, run:
 $ ./build.sh && ./test.sh
 ```
 
-If you run into a `gpg: Can't check signature: public key not found` error, see [issue 1654](https://github.com/couchbase/sync_gateway/issues/1654) for help.
+If you run into a `gpg: Can't check signature: public key not found` error, see [issue 1654](https://github.com/tophatch/sync_gateway/issues/1654) for help.
 
 **Snap dependencies to manifest**
 
-If you switch to a different Sync Gateway commit, for example after doing a `git pull` or a `git checkout branch`, you should re-pin (aka "snap") all of your dependencies to the versions specified in the [manifest.xml](https://github.com/couchbase/sync_gateway/blob/master/manifest/default.xml)
+If you switch to a different Sync Gateway commit, for example after doing a `git pull` or a `git checkout branch`, you should re-pin (aka "snap") all of your dependencies to the versions specified in the [manifest.xml](https://github.com/tophatch/sync_gateway/blob/master/manifest/default.xml)
 
 ```bash
 $ ./snap-manifest.sh

@@ -19,8 +19,8 @@ import (
 
 	"bytes"
 	"fmt"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
 )
 
 // Unit test for bug #314
@@ -277,7 +277,7 @@ func TestDocDeletionFromChannelCoalesced(t *testing.T) {
 	printChanges(changes)
 }
 
-// Benchmark to validate fix for https://github.com/couchbase/sync_gateway/issues/2428
+// Benchmark to validate fix for https://github.com/tophatch/sync_gateway/issues/2428
 func BenchmarkChangesFeedDocUnmarashalling(b *testing.B) {
 
 	db := setupTestDB(b)

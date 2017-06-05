@@ -143,7 +143,8 @@ func (h *handler) handleGetAttachment() error {
 	docid := h.PathVar("docid")
 	attachmentName := h.PathVar("attach")
 	revid := h.getQuery("rev")
-	body, err := h.db.GetRev(docid, revid, false, nil)
+	var attachmentsSince []string
+	body, err := h.db.GetRev(docid, revid, false, attachmentsSince)
 	log.Printf("Getting doc attachment: %s rev: %s", docid, revid)
 	if err != nil {
 		log.Printf("Getting doc attachment GetRev errored for: %s rev: %s", docid, revid)

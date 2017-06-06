@@ -146,15 +146,9 @@ func (h *handler) handleGetAttachment() error {
 	body, err := h.db.GetRev(docid, revid, false, nil)
 	if err != nil {
 		if strings.Contains(err.Error(), "404") {
-			syncData, err := h.db.GetSyncData(docid)
-			if err != nil {
-				log.Printf("Getting sync data errored for: %s rev: %s", docid, revid)
-				log.Printf("%v", err)
-				return err
-			}
-			body, err := h.db.GetRev(docid, syncData.CurrentRev, false, nil)
+			body, err := h.db.Get(docid)
 			if err != nil  {
-				log.Printf("Getting doc attachment GetRev errored for current rev for: %s rev: %s", docid, revid)
+				log.Printf("Getting doc attachment Get errored for current rev for: %s rev: %s", docid, revid)
 				log.Printf("%v", err)
 				return err
 			}

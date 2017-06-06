@@ -145,7 +145,7 @@ func (h *handler) handleGetAttachment() error {
 	revid := h.getQuery("rev")
 	body, err := h.db.GetRev(docid, revid, false, nil)
 	if err != nil {
-		if err.Error() == "404 missing" {
+		if strings.Contains(err.Error(), "404") {
 			syncData, err := h.db.GetSyncData(docid)
 			if err != nil {
 				log.Printf("Getting sync data errored for: %s rev: %s", docid, revid)

@@ -143,7 +143,14 @@ func (h *handler) handleGetAttachment() error {
 	revid := h.getQuery("rev")
 	body, err := h.db.GetRev(docid, revid, false, nil)
 	if err != nil {
-		return err
+		if strings.Contains(err.Error(), "404") {
+			body, err = h.db.Get(docid)
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
 	}
 	if body == nil {
 		return kNotFoundError

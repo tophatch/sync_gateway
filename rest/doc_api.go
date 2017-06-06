@@ -144,11 +144,25 @@ func (h *handler) handleGetAttachment() error {
 	attachmentName := h.PathVar("attach")
 	revid := h.getQuery("rev")
 	body, err := h.db.GetRev(docid, revid, false, nil)
-	log.Printf("Getting doc attachment: %s rev: %s", docid, revid)
 	if err != nil {
-		log.Printf("Getting doc attachment GetRev errored for: %s rev: %s", docid, revid)
-		log.Printf("%v", err)
-		return err
+		if err.Error() == "404 missing" {
+			syncData, err := h.db.GetSyncData(docid)
+			if err != nil {
+				log.Printf("Getting sync data errored for: %s rev: %s", docid, revid)
+				log.Printf("%v", err)
+				return err
+			}
+			body, err := h.db.GetRev(docid, syncData.CurrentRev, false, nil)
+			if err != nil  {
+				log.Printf("Getting doc attachment GetRev errored for current rev for: %s rev: %s", docid, revid)
+				log.Printf("%v", err)
+				return err
+			}
+		} else {
+			log.Printf("Getting doc attachment GetRev errored for: %s rev: %s", docid, revid)
+			log.Printf("%v", err)
+			return err
+		}
 	}
 	if body == nil {
 		log.Printf("Doc with id: %s and rev: %s has not body for attachment, returning 404", docid, revid)

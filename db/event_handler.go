@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/couchbase/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/base"
 	"io"
 	"io/ioutil"
 	"net/http"

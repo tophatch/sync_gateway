@@ -1,4 +1,4 @@
-[![Build Status](http://drone.couchbase.io/api/badges/couchbase/sync_gateway/status.svg)](http://drone.couchbase.io/couchbase/sync_gateway) [![Join the chat at https://gitter.im/couchbase/discuss](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/couchbase/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Go Report Card](https://goreportcard.com/badge/github.com/couchbase/sync_gateway)](https://goreportcard.com/report/github.com/couchbase/sync_gateway) [![codebeat badge](https://codebeat.co/badges/a8fb8053-742a-425b-8e8c-96f1c5bdbd26)](https://codebeat.co/projects/github-com-couchbase-sync_gateway) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status](http://drone.couchbase.io/api/badges/couchbase/sync_gateway/status.svg)](http://drone.couchbase.io/couchbase/sync_gateway) [![Join the chat at https://gitter.im/couchbase/discuss](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/couchbase/discuss?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Go Report Card](https://goreportcard.com/badge/github.com/tophatch/sync_gateway)](https://goreportcard.com/report/github.com/tophatch/sync_gateway) [![codebeat badge](https://codebeat.co/badges/a8fb8053-742a-425b-8e8c-96f1c5bdbd26)](https://codebeat.co/projects/github-com-couchbase-sync_gateway) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # Sync Gateway
 
@@ -46,12 +46,12 @@ $ yum install gcc
 
 ## Download and build
 
-**Warning** currently the `go get` style of building is [broken](https://github.com/couchbase/sync_gateway/issues/2209) due to upstream library changes, please use the [Extended Build Instructions](docs/BUILD.md)
+**Warning** currently the `go get` style of building is [broken](https://github.com/tophatch/sync_gateway/issues/2209) due to upstream library changes, please use the [Extended Build Instructions](docs/BUILD.md)
 
 Download and build the code in a single step via `go get`:
 
 ```
-$ go get -u -t github.com/couchbase/sync_gateway/...
+$ go get -u -t github.com/tophatch/sync_gateway/...
 ```
 
 After this operation completes you should have a new `sync_gateway` binary in `$GOPATH/bin`
@@ -73,5 +73,5 @@ Apache 2 license.
 [HTTPIE]: http://httpie.org
 [MAILING_LIST]: https://groups.google.com/forum/?fromgroups#!forum/mobile-couchbase
 [FORUM]: http://forums.couchbase.com
-[ISSUE_TRACKER]: https://github.com/couchbase/sync_gateway/issues?state=open
+[ISSUE_TRACKER]: https://github.com/tophatch/sync_gateway/issues?state=open
 [MAC_STABLE_BUILD]: http://cbfs-ext.hq.couchbase.com/mobile/SyncGateway/SyncGateway-Mac.zip

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/couchbase/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/base"
 )
 
 const googleTokenInfoURL = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token="

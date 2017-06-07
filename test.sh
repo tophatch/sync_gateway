@@ -7,7 +7,7 @@ if [ -d "godeps" ]; then
 fi
 
 echo "Running Sync Gateway unit tests"
-go test -v "$@" github.com/couchbase/sync_gateway/...
+go test -v "$@" github.com/tophatch/sync_gateway/...
 
 if [ -d godeps/src/github.com/couchbaselabs/sync-gateway-accel ]; then
     echo "Running Sync Gateway Accel unit tests"

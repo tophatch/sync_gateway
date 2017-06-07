@@ -24,8 +24,8 @@ import (
 	"sync/atomic"
 
 	sgbucket "github.com/couchbase/sg-bucket"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/db"
 )
 
 const ServerName = "@PRODUCT_NAME@"                   // DO NOT CHANGE; clients check this

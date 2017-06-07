@@ -16,8 +16,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
 )
 
 // Options for changes-feeds
@@ -266,7 +266,7 @@ func (db *Database) appendUserFeed(feeds []<-chan *ChangeEntry, names []string, 
 func (db *Database) checkForUserUpdates(userChangeCount uint64, changeWaiter *changeWaiter, isContinuous bool) (isChanged bool, newCount uint64, newChannels base.Set, err error) {
 
 	newCount = changeWaiter.CurrentUserCount()
-	// If not continuous, we force user reload as a workaround for https://github.com/couchbase/sync_gateway/issues/2068.  For continuous, #2068 is handled by addedChannels check, and
+	// If not continuous, we force user reload as a workaround for https://github.com/tophatch/sync_gateway/issues/2068.  For continuous, #2068 is handled by addedChannels check, and
 	// we can reload only when there's been a user change notification
 	if newCount > userChangeCount || !isContinuous {
 		var previousChannels channels.TimedSet

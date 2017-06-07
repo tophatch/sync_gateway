@@ -15,8 +15,8 @@ import (
 	"fmt"
 
 	sgbucket "github.com/couchbase/sg-bucket"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
 )
 
 var MaxBlockSize = 10000 // Maximum size of index block, in bytes

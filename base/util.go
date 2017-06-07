@@ -255,7 +255,7 @@ func CbsExpiryToTime(expiry uint32) time.Time {
 	}
 }
 
-// Needed due to https://github.com/couchbase/sync_gateway/issues/1345
+// Needed due to https://github.com/tophatch/sync_gateway/issues/1345
 func AddDbPathToCookie(rq *http.Request, cookie *http.Cookie) {
 
 	// "/db/foo" -> "db/foo"
@@ -473,7 +473,7 @@ func HighSeqNosToSequenceClock(highSeqs map[uint16]uint64) (*SequenceClockImpl, 
 }
 
 // Make sure that the index bucket and data bucket have correct sequence parity
-// https://github.com/couchbase/sync_gateway/issues/1133
+// https://github.com/tophatch/sync_gateway/issues/1133
 func VerifyBucketSequenceParity(indexBucketStableClock SequenceClock, bucket Bucket) error {
 
 	cbBucket, ok := bucket.(CouchbaseBucket)

@@ -146,6 +146,7 @@ func (h *handler) handleGetAttachment() error {
 		// if we cannot find the requested revision, get the latest
 		// revision
 		if strings.Contains(err.Error(), "404")  {
+			log.Printf("Request received for invalid revision: docid: %s, revid: %s. Returing latest revision", docid, revid)
 			body, err = h.db.Get(docid)
 			if err != nil {
 				return err

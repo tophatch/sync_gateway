@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"log"
 )
 
 // HTTP handler for a GET of a document

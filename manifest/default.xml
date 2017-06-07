@@ -2,6 +2,7 @@
 <manifest>
 
   <remote fetch="https://github.com/couchbase/" name="couchbase"/>
+  <remote fetch="https://github.com/tophatch/" name="tophatch"/>
   <remote fetch="https://github.com/couchbaselabs/" name="couchbaselabs"/>
   <remote fetch="https://github.com/couchbasedeps/" name="couchbasedeps"/>
   <remote fetch="https://github.com/elazarl/" name="elazarl"/>

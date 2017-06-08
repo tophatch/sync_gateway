@@ -86,13 +86,16 @@ func (db *DatabaseContext) GetDocSyncData(docid string) (syncData, error) {
 func (context *DatabaseContext) revCacheLoader(id IDAndRev) (body Body, history Body, channels base.Set, err error) {
 	var doc *document
 	if doc, err = context.GetDoc(id.DocID); doc == nil {
+		log.Printf("docid: %s, GetDoc returned nil doc", id.DocID)
 		return
 	}
 
 	if body, err = context.getRevision(doc, id.RevID); err != nil {
+		log.Printf("docid: %s, revid: %s getRevision returned err: %v", id.DocID, id.RevID, err)
 		return
 	}
 	if doc.History[id.RevID].Deleted {
+		log.Printf("docid: %s, revid: %s revision deleted", id.DocID, id.RevID)
 		body["_deleted"] = true
 	}
 	history = encodeRevisions(doc.History.getHistory(id.RevID))

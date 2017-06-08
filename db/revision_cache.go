@@ -3,6 +3,7 @@ package db
 import (
 	"container/list"
 	"sync"
+	"log"
 
 	"github.com/tophatch/sync_gateway/base"
 )
@@ -53,10 +54,12 @@ func NewRevisionCache(capacity int, loaderFunc RevisionCacheLoaderFunc) *Revisio
 func (rc *RevisionCache) Get(docid, revid string) (Body, Body, base.Set, error) {
 	value := rc.getValue(docid, revid, rc.loaderFunc != nil)
 	if value == nil {
+		log.Printf("docid: %s, revid: %s, rc.getValue returned nil", docid, revid)
 		return nil, nil, nil, nil
 	}
 	body, history, channels, err := value.load(rc.loaderFunc)
 	if err != nil {
+		log.Printf("docid: %s, revid: %s, value.load returned nil", docid, revid)
 		rc.removeValue(value) // don't keep failed loads in the cache
 	}
 	return body, history, channels, err

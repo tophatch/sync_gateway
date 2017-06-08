@@ -59,7 +59,7 @@ func (rc *RevisionCache) Get(docid, revid string) (Body, Body, base.Set, error) 
 	}
 	body, history, channels, err := value.load(rc.loaderFunc)
 	if err != nil {
-		log.Printf("docid: %s, revid: %s, value.load returned nil", docid, revid)
+		log.Printf("docid: %s, revid: %s, value.load returned nil.  err: %+v", docid, revid, nil)
 		rc.removeValue(value) // don't keep failed loads in the cache
 	}
 	return body, history, channels, err
@@ -115,11 +115,13 @@ func (value *revCacheValue) load(loaderFunc RevisionCacheLoaderFunc) (Body, Body
 	value.lock.Lock()
 	defer value.lock.Unlock()
 	if value.body == nil && value.err == nil {
+		log.Printf("Cache miss, getting doc: %s", value.key)
 		base.StatsExpvars.Add("revisionCache_misses", 1)
 		if loaderFunc != nil {
 			value.body, value.history, value.channels, value.err = loaderFunc(value.key)
 		}
 	} else {
+		log.Printf("Cache hit, getting doc: %s", value.key)
 		base.StatsExpvars.Add("revisionCache_hits", 1)
 	}
 	body := value.body

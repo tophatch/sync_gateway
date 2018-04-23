@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/couchbase/gocb"
-	sgbucket "github.com/couchbase/sg-bucket"
+	sgbucket "github.com/tophatch/sg-bucket"
 	"gopkg.in/couchbase/gocbcore.v7"
 )
 

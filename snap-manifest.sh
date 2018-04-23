@@ -60,7 +60,7 @@ def update_sg_version(manifest_xml_content, commit):
     return manifest_xml_content
 
 def get_manifest_xml_from_sg_github(commit):
-    manifest_url="https://raw.githubusercontent.com/couchbase/sync_gateway/{}/manifest/default.xml".format(commit)
+    manifest_url="https://raw.githubusercontent.com/tophatch/sync_gateway/{}/manifest/default.xml".format(commit)
     print("Fetching manifest from: {}".format(manifest_url))
     response = urllib2.urlopen(manifest_url)
     return ET.ElementTree(file=response)

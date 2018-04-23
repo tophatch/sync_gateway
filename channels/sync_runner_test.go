@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/couchbaselabs/go.assert"
-	"github.com/couchbase/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/base"
 )
 
 func TestRequireUser(t *testing.T) {

@@ -14,10 +14,10 @@ import (
 	"github.com/snej/go-blip"
 	"golang.org/x/net/websocket"
 
-	"github.com/couchbase/sync_gateway/auth"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/auth"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/db"
 )
 
 // Represents one BLIP connection (socket) opened by a client.

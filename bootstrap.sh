@@ -122,7 +122,7 @@ downloadHelperScripts () {
 
     if [ ! -f test_integration.sh ]; then
 	echo "Downloading test_integration.sh"
-	curl -s "https://raw.githubusercontent.com/couchbase/sync_gateway/$COMMIT/test_integration.sh" > test_integration.sh
+	curl -s "https://raw.githubusercontent.com/tophatch/sync_gateway/$COMMIT/test_integration.sh" > test_integration.sh
 	chmod +x test_integration.sh
     fi
 

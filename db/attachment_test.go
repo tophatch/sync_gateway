@@ -17,7 +17,7 @@ import (
 
 	"github.com/tophatch/sync_gateway/channels"
 	"github.com/couchbaselabs/go.assert"
-	"github.com/couchbase/sync_gateway/base"
+	"github.com/test/sync_gateway/base"
 )
 
 func unjson(j string) Body {

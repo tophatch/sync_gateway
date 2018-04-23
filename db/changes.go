@@ -82,6 +82,32 @@ func (db *Database) addDocToChangeEntry(entry *ChangeEntry, options ChangesOptio
 		return
 	}
 
+	// If this is pseudo doc, it will not be in the cache so ignore
+	if entry.pseudoDoc {
+		return
+	}
+
+	var doc *document
+	var err error
+	// The document, which may include just the syncMeta or may include syncMeta + Body, depending on circumstances
+	if options.IncludeDocs {
+		// load whole doc
+		doc, err = db.GetDoc(entry.ID)
+		if err != nil {
+			base.Warn("Changes feed: error getting doc %q: %v", entry.ID, err)
+			return
+		}
+
+	} else {
+		// get doc metadata
+		doc = &document{}
+		doc.syncData, err = db.GetDocSyncData(entry.ID)
+		if err != nil {
+			base.Warn("Changes feed: error getting doc sync data %q: %v", entry.ID, err)
+			return
+		}
+
+	}
 	db.AddDocInstanceToChangeEntry(entry, doc, options)
 }
 

@@ -26,10 +26,10 @@ import (
 	"github.com/couchbaselabs/go.assert"
 	"github.com/robertkrimen/otto/underscore"
 
-	"github.com/couchbase/sync_gateway/auth"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/auth"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/db"
 	"io"
 	"io/ioutil"
 	"mime"
@@ -2553,7 +2553,7 @@ func TestEventConfigValidationInvalid(t *testing.T) {
 	sc.Close()
 }
 
-// Reproduces https://github.com/couchbase/sync_gateway/issues/2427
+// Reproduces https://github.com/tophatch/sync_gateway/issues/2427
 // NOTE: to repro, you must run with -race flag
 func TestBulkGetRevPruning(t *testing.T) {
 
@@ -2880,7 +2880,7 @@ func TestDocExpiry(t *testing.T) {
 
 }
 
-// Reproduces https://github.com/couchbase/sync_gateway/issues/916.  The test-only RestartListener operation used to simulate a
+// Reproduces https://github.com/tophatch/sync_gateway/issues/916.  The test-only RestartListener operation used to simulate a
 // SG restart isn't race-safe, so disabling the test for now.  Should be possible to reinstate this as a proper unit test
 // once we add the ability to take a bucket offline/online.
 func DisabledTestLongpollWithWildcard(t *testing.T) {

@@ -12,8 +12,8 @@ package db
 import (
 	"errors"
 	"sync"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
 )
 
 // Implementation of ChannelStorage that stores entries as an append-based list of

@@ -173,7 +173,7 @@ def path_to_manifest():
     path_components = [
         "src",
         "github.com",
-        "couchbase",
+        "tophatch",
         "sync_gateway",
         "manifest",
         "default.xml"

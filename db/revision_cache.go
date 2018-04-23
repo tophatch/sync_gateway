@@ -4,7 +4,7 @@ import (
 	"container/list"
 	"sync"
 
-	"github.com/couchbase/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/base"
 )
 
 // Number of recently-accessed doc revisions to cache in RAM

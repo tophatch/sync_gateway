@@ -21,7 +21,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/couchbase/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/base"
 	"github.com/couchbaselabs/go.assert"
 )
 

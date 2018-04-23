@@ -15,7 +15,7 @@ import (
 
 	"github.com/couchbaselabs/go.assert"
 
-	"github.com/couchbase/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/base"
 	"github.com/robertkrimen/otto"
 	"github.com/robertkrimen/otto/underscore"
 )

@@ -274,7 +274,7 @@ export SG_TEST_BACKING_STORE=Couchbase
 # Run Sync Gateway Tests
 for i in "${arr[@]}"
 do
-    go test -v -run ^"$i"$ github.com/couchbase/sync_gateway/...
+    go test -v -run ^"$i"$ github.com/tophatch/sync_gateway/...
 done
 
 # Run Sync Gateway Accel tests

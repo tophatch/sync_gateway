@@ -20,8 +20,8 @@ import (
 	"strings"
 	"sync"
 
-	sgbucket "github.com/couchbase/sg-bucket"
-	"github.com/couchbase/sync_gateway/base"
+	sgbucket "github.com/tophatch/sg-bucket"
+	"github.com/tophatch/sync_gateway/base"
 )
 
 const (

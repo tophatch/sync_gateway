@@ -1,7 +1,7 @@
 package db
 
 import (
-	sgbucket "github.com/tophatch/sg-bucket"
+	sgbucket "github.com/couchbase/sg-bucket"
 	"github.com/tophatch/sync_gateway/base"
 	"github.com/tophatch/sync_gateway/channels"
 )

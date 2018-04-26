@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/tophatch/sg-bucket"
+	"github.com/couchbase/sg-bucket"
 	"github.com/tophatch/sync_gateway/base"
 	"github.com/tophatch/sync_gateway/db"
 )

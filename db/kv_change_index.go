@@ -20,7 +20,7 @@ import (
 	"strings"
 	"sync"
 
-	sgbucket "github.com/tophatch/sg-bucket"
+	sgbucket "github.com/couchbase/sg-bucket"
 	"github.com/tophatch/sync_gateway/base"
 )
 

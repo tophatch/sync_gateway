@@ -19,7 +19,7 @@ import (
 	"reflect"
 
 	"github.com/couchbase/gocb"
-	sgbucket "github.com/tophatch/sg-bucket"
+	sgbucket "github.com/couchbase/sg-bucket"
 	"github.com/couchbaselabs/go.assert"
 	"gopkg.in/couchbase/gocbcore.v7"
 )

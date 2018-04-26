@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/couchbase/go-blip"
+	"github.com/snej/go-blip"
 	"golang.org/x/net/websocket"
 
 	"github.com/tophatch/sync_gateway/auth"

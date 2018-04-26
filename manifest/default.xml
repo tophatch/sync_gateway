@@ -33,7 +33,7 @@
 
   
   <!-- Sync Gateway -->
-  <project name="sync_gateway" path="godeps/src/github.com/tophatch/sync_gateway" remote="tophatch" revision="7cf8faa49410002631087a981954d75d8571d112"/> 
+  <project name="sync_gateway" path="godeps/src/github.com/tophatch/sync_gateway" remote="tophatch"/> 
 
   
   <!-- Sync Gateway Accel-->

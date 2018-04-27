@@ -892,3 +892,23 @@ func ConvertBackQuotedStrings(data []byte) []byte {
 		return bytes
 	})
 }
+
+// Make a deep copy from src into dst.
+// Taken from https://github.com/getlantern/deepcopy, commit 7f45deb8130a0acc553242eb0e009e3f6f3d9ce3 (Apache 2 licensed)
+func DeepCopy(dst interface{}, src interface{}) error {
+	if dst == nil {
+		return fmt.Errorf("dst cannot be nil")
+	}
+	if src == nil {
+		return fmt.Errorf("src cannot be nil")
+	}
+	bytes, err := json.Marshal(src)
+	if err != nil {
+		return fmt.Errorf("Unable to marshal src: %s", err)
+	}
+	err = json.Unmarshal(bytes, dst)
+	if err != nil {
+		return fmt.Errorf("Unable to unmarshal into dst: %s", err)
+	}
+	return nil
+}

@@ -866,7 +866,6 @@ func TestBulkDocsUnusedSequencesMultipleSG(t *testing.T) {
 	spec := base.GetTestBucketSpec(base.DataBucket)
 	username, password, _ := spec.Auth.GetCredentials()
 
-
 	// Add a second database that uses the same underlying bucket.
 	_, err = rt2.RestTesterServerContext.AddDatabaseFromConfig(&DbConfig{
 		BucketConfig: BucketConfig{
@@ -875,8 +874,8 @@ func TestBulkDocsUnusedSequencesMultipleSG(t *testing.T) {
 			Username: username,
 			Password: password,
 		},
-		NumIndexReplicas: rt1.DatabaseConfig.NumIndexReplicas,  // Use the same NumIndexReplicas as original test bucket (0)
-		Name: "db",
+		NumIndexReplicas: rt1.DatabaseConfig.NumIndexReplicas, // Use the same NumIndexReplicas as original test bucket (0)
+		Name:             "db",
 	})
 
 	assertNoError(t, err, "Failed to add database to rest tester")
@@ -959,22 +958,7 @@ func TestBulkDocsUnusedSequencesMultiRevDoc(t *testing.T) {
 		AdminInterface: &DefaultAdminInterface,
 	})
 
-	server := base.UnitTestUrl()
-	bucketName := rt1.RestTesterBucket.GetName()
-	spec := base.GetTestBucketSpec(base.DataBucket)
-	username, password, _ := spec.Auth.GetCredentials()
-
-	rt1UseXattrs := rt1.GetDatabase().UseXattrs()
-	_, err = rt2.RestTesterServerContext.AddDatabaseFromConfig(&DbConfig{
-		BucketConfig: BucketConfig{
-			Server:   &server,
-			Bucket:   &bucketName,
-			Username: username,
-			Password: password,
-		},
-		Name:         "db",
-		EnableXattrs: &rt1UseXattrs,
-	})
+	_, err = rt2.RestTesterServerContext.AddDatabaseFromConfig(rt1.DatabaseConfig.MustDeepCopy())
 
 	assertNoError(t, err, "Failed to add database to rest tester")
 

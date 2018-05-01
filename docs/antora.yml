@@ -1,6 +1,7 @@
 name: sync_gateway
 title: Sync Gateway
-version: '2.0'
+version: '2.1'
 start_page: ROOT:installation.adoc
 nav:
 - modules/docs/nav.adoc
+

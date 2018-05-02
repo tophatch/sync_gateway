@@ -40,7 +40,7 @@
   <project groups="notdefault,sg-accel" name="sync-gateway-accel" path="godeps/src/github.com/couchbaselabs/sync-gateway-accel" remote="couchbaselabs_private" revision="266fdfe7c8a663735c2b9a737469bd5b86df6e5f"/>
 
     <!-- Sync Gateway -->
-    <project name="sync_gateway" path="godeps/src/github.com/tophatch/sync_gateway" remote="tophatch" revision="tophatch/patch/2.0.0"/>
+    <project name="sync_gateway" path="godeps/src/github.com/tophatch/sync_gateway" remote="tophatch" revision="225decd3790ee739d71c5d0c6d7233f9706e1f72"/>
 
 
     <!-- Sync Gateway Accel-->

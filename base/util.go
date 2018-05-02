@@ -771,7 +771,6 @@ func GetExpvarAsString(mapName string, name string) string {
 		return ""
 	}
 }
-<<<<<<< HEAD
 
 // Returns int representation of an expvar, given map name and key name
 func GetExpvarAsInt(mapName string, name string) (int, error) {
@@ -843,5 +842,3 @@ func ConvertBackQuotedStrings(data []byte) []byte {
 		return bytes
 	})
 }
-=======
->>>>>>> release/1.5.1

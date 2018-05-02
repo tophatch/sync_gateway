@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/couchbase/go-blip"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/db"
 )
 
 // Function signature for something that parses a sequence id from a string

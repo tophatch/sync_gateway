@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/couchbase/goutils/logging"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/db"
 )
 
 var doc_1k_format = `{%s
@@ -181,10 +181,10 @@ func BenchmarkReadOps_RevsDiff(b *testing.B) {
 	defer PurgeDoc(rt, "doc1k")
 
 	// Create target doc for revs_diff:
-	doc1k_bulkDocs_meta := `"_id":"doc1k", 
-	"_rev":"12-abc", 
+	doc1k_bulkDocs_meta := `"_id":"doc1k",
+	"_rev":"12-abc",
 	"_revisions":{
-		"start": 12, 
+		"start": 12,
 		"ids": ["abc", "eleven", "ten", "nine"]
 		},`
 

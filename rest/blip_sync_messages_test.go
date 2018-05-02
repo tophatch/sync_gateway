@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/couchbase/go-blip"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/db"
 	"github.com/couchbaselabs/go.assert"
 )
 

@@ -5,7 +5,7 @@ import (
 	"github.com/couchbaselabs/go.assert"
 	"encoding/json"
 	"log"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/db"
 )
 
 func TestDocumentUnmarshal(t *testing.T) {

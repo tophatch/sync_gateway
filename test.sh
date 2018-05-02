@@ -19,7 +19,7 @@ fi
 EXTRA_FLAGS="$EXTRA_FLAGS -timeout=20m"
 
 echo "Running Sync Gateway unit tests"
-go test "$@" $EXTRA_FLAGS github.com/couchbase/sync_gateway/...
+go test "$@" $EXTRA_FLAGS github.com/tophatch/sync_gateway/...
 
 if [ -d godeps/src/github.com/couchbaselabs/sync-gateway-accel ]; then
     echo "Running Sync Gateway Accel unit tests"

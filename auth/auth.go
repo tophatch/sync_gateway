@@ -16,8 +16,8 @@ import (
 	"github.com/coreos/go-oidc/jose"
 	"github.com/coreos/go-oidc/oidc"
 	"github.com/couchbase/go-couchbase"
-	"github.com/couchbase/sync_gateway/base"
-	ch "github.com/couchbase/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/base"
+	ch "github.com/tophatch/sync_gateway/channels"
 	pkgerrors "github.com/pkg/errors"
 )
 

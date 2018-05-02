@@ -14,10 +14,10 @@ import (
 	"time"
 
 	"github.com/couchbase/go-blip"
-	"github.com/couchbase/sync_gateway/auth"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/auth"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/db"
 	"golang.org/x/net/websocket"
 )
 

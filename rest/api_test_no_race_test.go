@@ -21,8 +21,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/couchbase/sync_gateway/channels"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/db"
 	"github.com/couchbaselabs/go.assert"
 )
 

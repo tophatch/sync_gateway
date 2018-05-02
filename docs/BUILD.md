@@ -2,7 +2,7 @@
 Building From Source (via repo)
 -------------------------------
 
-In order to build with [pinned dependencies](https://github.com/couchbase/sync_gateway/blob/master/manifest/default.xml), you will need to use the the `repo` multi-repository tool.
+In order to build with [pinned dependencies](https://github.com/tophatch/sync_gateway/blob/master/manifest/default.xml), you will need to use the the `repo` multi-repository tool.
 
 **Install prequisites**
 
@@ -38,7 +38,7 @@ To build Sync Gateway from source and run the unit tests, run:
 $ ./build.sh && ./test.sh
 ```
 
-If you run into a `gpg: Can't check signature: public key not found` error, see [issue 1654](https://github.com/couchbase/sync_gateway/issues/1654) for help.
+If you run into a `gpg: Can't check signature: public key not found` error, see [issue 1654](https://github.com/tophatch/sync_gateway/issues/1654) for help.
 
 **Bootstrap variations: start on a different commit**
 

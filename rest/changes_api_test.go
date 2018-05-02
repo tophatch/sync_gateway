@@ -23,9 +23,9 @@ import (
 	"bytes"
 	"net/http"
 
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/db"
 )
 
 type indexTester struct {
@@ -1642,6 +1642,195 @@ func TestChangesActiveOnlyWithLimit(t *testing.T) {
 			assert.Equals(t, len(entry.Changes), 2)
 		}
 	}
+}
+
+// Test active-only and limit handling during cache backfill from the view.  Flushes the channel cache
+// prior to changes requests in order to force view backfill.  Covers https://github.com/couchbase/sync_gateway/issues/2955 in
+// additional to general view handling.
+func TestChangesActiveOnlyWithLimitAndViewBackfill(t *testing.T) {
+
+	it := initIndexTester(false, `function(doc) {channel(doc.channel);}`)
+	defer it.Close()
+
+	response := it.SendAdminRequest("PUT", "/_logging", `{"HTTP":true, "Changes":true, "Changes+":true, "Cache":true, "Cache+":true}`)
+	assert.True(t, response != nil)
+
+	// Create user:
+	a := it.ServerContext().Database("db").Authenticator()
+	bernard, err := a.NewUser("bernard", "letmein", channels.SetOf("PBS", "ABC"))
+	assert.True(t, err == nil)
+	a.Save(bernard)
+
+	// Put several documents
+	var body db.Body
+	response = it.SendAdminRequest("PUT", "/db/deletedDoc", `{"channel":["PBS"]}`)
+	json.Unmarshal(response.Body.Bytes(), &body)
+	deletedRev := body["rev"].(string)
+	assertStatus(t, response, 201)
+	response = it.SendAdminRequest("PUT", "/db/removedDoc", `{"channel":["PBS"]}`)
+	json.Unmarshal(response.Body.Bytes(), &body)
+	removedRev := body["rev"].(string)
+	assertStatus(t, response, 201)
+	response = it.SendAdminRequest("PUT", "/db/activeDoc0", `{"channel":["PBS"]}`)
+	assertStatus(t, response, 201)
+
+	response = it.SendAdminRequest("PUT", "/db/partialRemovalDoc", `{"channel":["PBS","ABC"]}`)
+	json.Unmarshal(response.Body.Bytes(), &body)
+	partialRemovalRev := body["rev"].(string)
+	assertStatus(t, response, 201)
+
+	response = it.SendAdminRequest("PUT", "/db/conflictedDoc", `{"channel":["PBS"]}`)
+	assertStatus(t, response, 201)
+
+	// Create a conflict, then tombstone it
+	response = it.SendAdminRequest("POST", "/db/_bulk_docs", `{"docs":[{"_id":"conflictedDoc","channel":["PBS"], "_rev":"1-conflictTombstone"}], "new_edits":false}`)
+	assertStatus(t, response, 201)
+	response = it.SendAdminRequest("DELETE", "/db/conflictedDoc?rev=1-conflictTombstone", "")
+	assertStatus(t, response, 200)
+
+	// Create a conflict, and don't tombstone it
+	response = it.SendAdminRequest("POST", "/db/_bulk_docs", `{"docs":[{"_id":"conflictedDoc","channel":["PBS"], "_rev":"1-conflictActive"}], "new_edits":false}`)
+	assertStatus(t, response, 201)
+
+	var changes struct {
+		Results  []db.ChangeEntry
+		Last_Seq interface{}
+	}
+
+	// Get pre-delete changes
+	changesJSON := `{"style":"all_docs"}`
+	changesResponse := it.Send(requestByUser("POST", "/db/_changes", changesJSON, "bernard"))
+	err = json.Unmarshal(changesResponse.Body.Bytes(), &changes)
+	assertNoError(t, err, "Error unmarshalling changes response")
+	assert.Equals(t, len(changes.Results), 5)
+
+	// Delete
+	response = it.SendAdminRequest("DELETE", fmt.Sprintf("/db/deletedDoc?rev=%s", deletedRev), "")
+	assertStatus(t, response, 200)
+
+	// Removed
+	response = it.SendAdminRequest("PUT", "/db/removedDoc", fmt.Sprintf(`{"_rev":%q, "channel":["HBO"]}`, removedRev))
+	assertStatus(t, response, 201)
+
+	// Partially removed
+	response = it.SendAdminRequest("PUT", "/db/partialRemovalDoc", fmt.Sprintf(`{"_rev":%q, "channel":["PBS"]}`, partialRemovalRev))
+	assertStatus(t, response, 201)
+
+	//Create additional active docs
+	response = it.SendAdminRequest("PUT", "/db/activeDoc1", `{"channel":["PBS"]}`)
+	assertStatus(t, response, 201)
+	response = it.SendAdminRequest("PUT", "/db/activeDoc2", `{"channel":["PBS"]}`)
+	assertStatus(t, response, 201)
+	response = it.SendAdminRequest("PUT", "/db/activeDoc3", `{"channel":["PBS"]}`)
+	assertStatus(t, response, 201)
+	response = it.SendAdminRequest("PUT", "/db/activeDoc4", `{"channel":["PBS"]}`)
+	assertStatus(t, response, 201)
+	response = it.SendAdminRequest("PUT", "/db/activeDoc5", `{"channel":["PBS"]}`)
+	assertStatus(t, response, 201)
+
+	// TODO: Make db.waitForSequence public and use that instead of a sleep here
+	time.Sleep(100 * time.Millisecond)
+
+	// Normal changes
+	changesJSON = `{"style":"all_docs"}`
+	changesResponse = it.Send(requestByUser("POST", "/db/_changes", changesJSON, "bernard"))
+	err = json.Unmarshal(changesResponse.Body.Bytes(), &changes)
+	assertNoError(t, err, "Error unmarshalling changes response")
+	assert.Equals(t, len(changes.Results), 10)
+	for _, entry := range changes.Results {
+		log.Printf("Entry:%+v", entry)
+		if entry.ID == "conflictedDoc" {
+			assert.Equals(t, len(entry.Changes), 3)
+		}
+	}
+
+	// Active only NO Limit, POST
+	testDb := it.ServerContext().Database("db")
+	testDb.FlushChannelCache()
+
+	changesJSON = `{"style":"all_docs", "active_only":true}`
+	changes.Results = nil
+	changesResponse = it.Send(requestByUser("POST", "/db/_changes", changesJSON, "bernard"))
+	err = json.Unmarshal(changesResponse.Body.Bytes(), &changes)
+	assertNoError(t, err, "Error unmarshalling changes response")
+	assert.Equals(t, len(changes.Results), 8)
+	for _, entry := range changes.Results {
+		log.Printf("Entry:%+v", entry)
+		// validate conflicted handling
+		if entry.ID == "conflictedDoc" {
+			assert.Equals(t, len(entry.Changes), 2)
+		}
+	}
+
+	// Active only with Limit, POST
+	testDb.FlushChannelCache()
+	changesJSON = `{"style":"all_docs", "active_only":true, "limit":5}`
+	changes.Results = nil
+	changesResponse = it.Send(requestByUser("POST", "/db/_changes", changesJSON, "bernard"))
+	err = json.Unmarshal(changesResponse.Body.Bytes(), &changes)
+	assertNoError(t, err, "Error unmarshalling changes response")
+	assert.Equals(t, len(changes.Results), 5)
+	for _, entry := range changes.Results {
+		log.Printf("Entry:%+v", entry)
+		// validate conflicted handling
+		if entry.ID == "conflictedDoc" {
+			assert.Equals(t, len(entry.Changes), 2)
+		}
+	}
+
+	// Active only with Limit, GET
+	testDb.FlushChannelCache()
+	changes.Results = nil
+	changesResponse = it.Send(requestByUser("GET", "/db/_changes?style=all_docs&active_only=true&limit=5", "", "bernard"))
+	err = json.Unmarshal(changesResponse.Body.Bytes(), &changes)
+	assertNoError(t, err, "Error unmarshalling changes response")
+	assert.Equals(t, len(changes.Results), 5)
+	for _, entry := range changes.Results {
+		log.Printf("Entry:%+v", entry)
+		if entry.ID == "conflictedDoc" {
+			assert.Equals(t, len(entry.Changes), 2)
+		}
+	}
+
+	// Active only with Limit set higher than number of revisions, POST
+	testDb.FlushChannelCache()
+	changesJSON = `{"style":"all_docs", "active_only":true, "limit":15}`
+	changes.Results = nil
+	changesResponse = it.Send(requestByUser("POST", "/db/_changes", changesJSON, "bernard"))
+	err = json.Unmarshal(changesResponse.Body.Bytes(), &changes)
+	assertNoError(t, err, "Error unmarshalling changes response")
+	assert.Equals(t, len(changes.Results), 8)
+	for _, entry := range changes.Results {
+		log.Printf("Entry:%+v", entry)
+		// validate conflicted handling
+		if entry.ID == "conflictedDoc" {
+			assert.Equals(t, len(entry.Changes), 2)
+		}
+	}
+
+	// No limit active only, GET, followed by normal (https://github.com/couchbase/sync_gateway/issues/2955)
+	testDb.FlushChannelCache()
+	changes.Results = nil
+	changesResponse = it.Send(requestByUser("GET", "/db/_changes?style=all_docs&active_only=true", "", "bernard"))
+	err = json.Unmarshal(changesResponse.Body.Bytes(), &changes)
+	assertNoError(t, err, "Error unmarshalling changes response")
+	assert.Equals(t, len(changes.Results), 8)
+	for _, entry := range changes.Results {
+		log.Printf("Entry:%+v", entry)
+		if entry.ID == "conflictedDoc" {
+			assert.Equals(t, len(entry.Changes), 2)
+		}
+	}
+
+	var updatedChanges struct {
+		Results  []db.ChangeEntry
+		Last_Seq interface{}
+	}
+	changesResponse = it.Send(requestByUser("GET", "/db/_changes", "", "bernard"))
+	err = json.Unmarshal(changesResponse.Body.Bytes(), &updatedChanges)
+	assertNoError(t, err, "Error unmarshalling changes response")
+	assert.Equals(t, len(updatedChanges.Results), 10)
+
 }
 
 // Test active-only and limit handling during cache backfill from the view.  Flushes the channel cache

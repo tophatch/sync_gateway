@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	sgbucket "github.com/couchbase/sg-bucket"
-	"github.com/couchbase/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/base"
 	"github.com/robertkrimen/otto"
 	_ "github.com/robertkrimen/otto/underscore"
 )

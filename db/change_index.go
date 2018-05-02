@@ -2,8 +2,8 @@ package db
 
 import (
 	sgbucket "github.com/couchbase/sg-bucket"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
 )
 
 // A ChangeIndex is responsible for indexing incoming events from change_listener, and

@@ -601,7 +601,7 @@ func HighSeqNosToSequenceClock(highSeqs map[uint16]uint64) (*SequenceClockImpl, 
 }
 
 // Make sure that the index bucket and data bucket have correct sequence parity
-// See https://github.com/couchbase/sync_gateway/issues/1133 for more details
+// https://github.com/tophatch/sync_gateway/issues/1133
 func VerifyBucketSequenceParity(indexBucketStableClock SequenceClock, bucket Bucket) error {
 
 	maxVbNo, err := bucket.GetMaxVbno()
@@ -771,6 +771,7 @@ func GetExpvarAsString(mapName string, name string) string {
 		return ""
 	}
 }
+<<<<<<< HEAD
 
 // Returns int representation of an expvar, given map name and key name
 func GetExpvarAsInt(mapName string, name string) (int, error) {
@@ -842,3 +843,5 @@ func ConvertBackQuotedStrings(data []byte) []byte {
 		return bytes
 	})
 }
+=======
+>>>>>>> release/1.5.1

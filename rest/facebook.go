@@ -14,7 +14,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/couchbase/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/base"
 )
 
 const kFacebookOpenGraphURL = "https://graph.facebook.com"

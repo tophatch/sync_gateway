@@ -18,8 +18,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/db"
 )
 
 // HTTP handler for a GET of a document
@@ -28,6 +28,7 @@ func (h *handler) handleGetDoc() error {
 	revid := h.getQuery("rev")
 	openRevs := h.getQuery("open_revs")
 	showExp := h.getBoolQuery("show_exp")
+	log.Printf("Getting doc: %s rev: %s", docid, revid)
 
 	// Check whether the caller wants a revision history, or attachment bodies, or both:
 	var revsLimit = 0
@@ -144,18 +145,33 @@ func (h *handler) handleGetAttachment() error {
 	revid := h.getQuery("rev")
 	body, err := h.db.GetRev(docid, revid, false, nil)
 	if err != nil {
-		return err
+		if strings.Contains(err.Error(), "404") {
+			body, err = h.db.Get(docid)
+			if err != nil  {
+				log.Printf("Getting doc attachment Get errored for current rev for: %s rev: %s", docid, revid)
+				log.Printf("%v", err)
+				return err
+			}
+		} else {
+			log.Printf("Getting doc attachment GetRev errored for: %s rev: %s", docid, revid)
+			log.Printf("%v", err)
+			return err
+		}
 	}
 	if body == nil {
+		log.Printf("Doc with id: %s and rev: %s has not body for attachment, returning 404", docid, revid)
 		return kNotFoundError
 	}
 	meta, ok := db.BodyAttachments(body)[attachmentName].(map[string]interface{})
 	if !ok {
+		log.Printf("Getting doc body attachment not ok for doc with id: %s and rev %s", docid, revid)
 		return base.HTTPErrorf(http.StatusNotFound, "missing attachment %s", attachmentName)
 	}
 	digest := meta["digest"].(string)
 	data, err := h.db.GetAttachment(db.AttachmentKey(digest))
 	if err != nil {
+		log.Printf("Getting doc attachment data returned err for doc with id: %s and rev %s", docid, revid)
+		log.Printf("%v", err)
 		return err
 	}
 
@@ -163,6 +179,7 @@ func (h *handler) handleGetAttachment() error {
 	if status > 299 {
 		return base.HTTPErrorf(status, "")
 	} else if status == http.StatusPartialContent {
+		log.Printf("Getting doc attachment status partial content doc with id: %s and rev %s", docid, revid)
 		data = data[start:end]
 	}
 	h.setHeader("Content-Length", strconv.FormatUint(uint64(len(data)), 10))

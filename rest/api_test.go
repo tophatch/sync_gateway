@@ -27,10 +27,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/couchbase/sync_gateway/auth"
-	"github.com/couchbase/sync_gateway/base"
-	"github.com/couchbase/sync_gateway/channels"
-	"github.com/couchbase/sync_gateway/db"
+	"github.com/tophatch/sync_gateway/auth"
+	"github.com/tophatch/sync_gateway/base"
+	"github.com/tophatch/sync_gateway/channels"
+	"github.com/tophatch/sync_gateway/db"
 	"github.com/couchbaselabs/go.assert"
 	"github.com/robertkrimen/otto/underscore"
 )
@@ -2956,7 +2956,7 @@ func TestEventConfigValidationInvalid(t *testing.T) {
 
 }
 
-// Reproduces https://github.com/couchbase/sync_gateway/issues/2427
+// Reproduces https://github.com/tophatch/sync_gateway/issues/2427
 // NOTE: to repro, you must run with -race flag
 func TestBulkGetRevPruning(t *testing.T) {
 

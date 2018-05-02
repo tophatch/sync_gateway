@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"log"
 
 	"github.com/tophatch/sync_gateway/base"
 	"github.com/tophatch/sync_gateway/db"
